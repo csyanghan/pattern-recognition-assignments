@@ -1,0 +1,212 @@
+\documentclass{article}
+
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage[plain]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{enumerate}
+\usepackage{color}
+\usetikzlibrary{automata,positioning}
+
+%
+% Basic Document Settings
+%
+
+\topmargin=-0.45in
+\evensidemargin=0in
+\oddsidemargin=0in
+\textwidth=6.5in
+\textheight=9.0in
+\headsep=0.25in
+
+\linespread{1.1}
+
+\pagestyle{fancy}
+\lhead{\hmwkAuthorName}
+\chead{\hmwkClass}
+\rhead{\hmwkTitle}
+\lfoot{\Address}
+\rfoot{Page \thepage}
+\cfoot{}
+
+\renewcommand\headrulewidth{0.4pt}
+\renewcommand\footrulewidth{0.4pt}
+
+\setlength\parindent{0pt}
+
+%
+% Create Problem Sections
+%
+
+\newcommand{\enterProblemHeader}[1]{
+    \nobreak\extramarks{}{Problem \arabic{#1} continued on next page\ldots}\nobreak{}
+    \nobreak\extramarks{Problem \arabic{#1} (continued)}{Problem \arabic{#1} continued on next page\ldots}\nobreak{}
+}
+
+\newcommand{\exitProblemHeader}[1]{
+    \nobreak\extramarks{Problem \arabic{#1} (continued)}{Problem \arabic{#1} continued on next page\ldots}\nobreak{}
+    \stepcounter{#1}
+    \nobreak\extramarks{Problem \arabic{#1}}{}\nobreak{}
+}
+
+\setcounter{secnumdepth}{0}
+\newcounter{partCounter}
+\newcounter{homeworkProblemCounter}
+\setcounter{homeworkProblemCounter}{1}
+\nobreak\extramarks{Problem \arabic{homeworkProblemCounter}}{}\nobreak{}
+
+\newenvironment{homeworkProblem}{
+    \section{Problem \arabic{homeworkProblemCounter}}
+    \setcounter{partCounter}{1}
+    \enterProblemHeader{homeworkProblemCounter}
+}{
+    \exitProblemHeader{homeworkProblemCounter}
+}
+
+%
+% Homework Details
+%   - Title
+%   - Due date
+%   - Class
+%   - Section/Time
+%   - Instructor
+%   - Author
+%
+
+\newcommand{\hmwkTitle}{Assignment\#4}
+\newcommand{\hmwkDueDate}{\today}
+\newcommand{\hmwkClass}{Pattern Recognition}
+\newcommand{\hmwkClassTime}{}
+\newcommand{\Address}{SSE TongJi University}
+\newcommand{\hmwkClassInstructor}{Professor Ying Shen}
+\newcommand{\hmwkAuthorName}{2031566/Yang Han}
+
+%
+% Title Page
+%
+
+\title{
+    \vspace{2in}
+    \textmd{\textbf{\hmwkClass\\ \hmwkTitle}}\\
+    \normalsize\vspace{0.1in}\small{By\ \textit{\hmwkClassInstructor\ \hmwkClassTime }}\\
+ %   \vspace{0.1in}\small{\Address \\ Due\ on\ \hmwkDueDate\  }
+    \vspace{3in}
+}
+
+\author{\textbf{\hmwkAuthorName}}
+\date{\today}
+
+\renewcommand{\part}[1]{\textbf{\large Part \Alph{partCounter}}\stepcounter{partCounter}\\}
+
+%
+% Various Helper Commands
+%
+
+% Useful for algorithms
+\newcommand{\alg}[1]{\textsc{\bfseries \footnotesize #1}}
+
+% For derivatives
+\newcommand{\deriv}[1]{\frac{\mathrm{d}}{\mathrm{d}x} (#1)}
+
+% For partial derivatives
+\newcommand{\pderiv}[2]{\frac{\partial}{\partial #1} (#2)}
+
+% Integral dx
+\newcommand{\dx}{\mathrm{d}x}
+
+% Alias for the Solution section header
+\newcommand{\solution}{\textbf{\large Solution}}
+
+% Probability commands: Expectation, Variance, Covariance, Bias
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\Bias}{\mathrm{Bias}}
+
+\begin{document}
+	\maketitle
+	\newpage
+	\begin{enumerate}
+		\item
+		Kernel computation cost
+		
+		1).Consider we have a two-dimensional input space such that the input vector is $x = (x_1, x_2)^T$
+		Define the feature mapping $\phi(x) = (x_1^2, \sqrt{2}x_1x_2, x_2^2)^T$, What is the corresponding kernel function,
+		i.e. $K(x,z)$? Do not level $\phi(x)$ in your final answer.
+
+		\solution:
+		
+		$K(x,z) = \phi(x)^T \cdot \phi(z) = (x_1^2, \sqrt{2}x_1x_2, x_2^2) \cdot (z_1^2, \sqrt{2}z_1z_2, z_2^2)^T = x_1^2z_1^2+ 2x_1x_2z_1z_2+x_2^2z_2^2$
+
+
+		2).Suppose we want to compute the value of the kernel function$K(x,z)$ from the previous
+		question, on two vectors $x,z \in \mathbb{R}^2$.How many additions and multiplications are needed if you 
+		
+		(a) map the input vector to the feature space and the perform the dot product on the mapped features?
+
+		\solution:
+		
+		To compute this projection, we need 4 multiplications, there exists two point, so need 8 multiplications,
+		and then the dot product itself requires 3 multiplications and 2 additions.so we totally need
+		11 multiplications and 2 additions.
+
+		(b) compute through the kernel function you derived in question 1?
+
+		\solution:
+
+		$K(x,z) = x_1^2z_1^2+ 2x_1x_2z_1z_2+x_2^2z_2^2 = (x_1z_1 + x_2z_2)^2$ \\
+		From the above equation, we can easily find that we need 3 multiplications and 1 additions.
+
+		\item
+		Kernel functions, Consider the following kernel function: \\
+		$
+			K(x,x^{'})=
+				\begin{cases}
+				1 &\mbox{if $x=x^{'}$}\\\
+				0 &\mbox{otherwise}
+				\end{cases}
+		$
+
+		1).Prove this is a legal kernel. That is, describe an implicit mapping: $\Phi:X \rightarrow \mathbb{R}^m$ such that
+		$ K(x, x^{'}) = \Phi(x) * \Phi(x^{'})$. (You may assume the instance space $X$ is finite.)
+		
+		\solution:
+
+		We get get the kernel matrix 
+		$ K = 
+				\begin{pmatrix}
+					1 & 0 & \cdots & 0 \\
+					0 & 1 & \cdots & 0 \\
+					\vdots & \vdots & \ddots & \vdots \\
+					0 & 0 & \cdots & 1 
+				\end{pmatrix}
+		$, and $k$ is a is positive semidefinite matrix, so this is a legal kernel.
+		
+		2).In this kernel space, any labeling of points in $X$ will be linearly separable. Justify this claim.
+
+		\solution:
+
+		$K(x_i,x_j)=\Phi(x_i)^T \cdot \Phi(x_j) = \begin{cases}
+			1 &\mbox{if $x_i=x_j$}\\\
+			0 &\mbox{otherwise}
+			\end{cases}
+		$
+		Then $\Phi(x_i) = e_i$, $e_i$ is the column vertor which the $i$th element is 1 as $[0,0,0,...,1..., 0]^T$
+
+		So the decision boundary is $f(x) = W^T \Phi(x) = W^T e_i = W_i = y_i$, all data point will be  linearly separable.
+		
+		3).Since all labelings are linearly separable, this kernel seems perfect for learning any target
+		function. Why is this actually a bad idea?
+		
+		\solution:
+
+		Because $W$ will overfit the data.
+		
+	\end{enumerate}
+
+\end{document}
