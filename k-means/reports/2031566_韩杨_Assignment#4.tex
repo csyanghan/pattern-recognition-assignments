@@ -7,7 +7,8 @@
 \usepackage{amsthm}
 \usepackage{amsfonts}
 \usepackage{tikz}
-\usepackage[plain]{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{algorithmicx,algorithm}
 \usepackage{algpseudocode}
 \usepackage{enumerate}
 \usepackage{color}
@@ -131,82 +132,79 @@
 \begin{document}
 	\maketitle
 	\newpage
-	\begin{enumerate}
-		\item
-		Kernel computation cost
+
+	\section*{1 Introduction} % Unnumbered section
+	In this assignment, I will implement KMeans and use it to cluster Seeds Data Set \((http://archive.ics.uci.edu/ \\
+	ml/datasets/seeds)\) and Iris Data Set\((http://archive.ics.uci.edu/ml/datasets/Iris)\).
+
+		\subsection{1.1 Seeds Dataset}
+			The dataset belongs to three different varieties of wheat and is consisted of seven geometric parameters, 1. area A,
+			2. perimeter P,
+			3. compactness C
+			4. length of kernel,
+			5. width of kernel,
+			6. asymmetry coefficient
+			7. length of kernel groove. All of these parameters were real-valued continuous.
+
+		\subsection{1.2 Iris Dataset}
+			Iris Dataset is perhaps the best known database to be found in the pattern recognition literature, 
+			The data set contains 3 classes of 50 instances each, where each class refers to a type of iris plant.
+			One class is linearly separable from the other 2; the latter are NOT linearly separable from each other.
+
+	\section{2 Data Preprocess}
+	As I show in the $preprocess.ipynb$ file, I mainly do three things:
+		\begin{enumerate}[1.]
+			\item Read the raw file content, cast the str type to float type save save them to csv format.
+			\item Map categories to ordered numbers(eg. 0,1,2...).
+			\item In order to eliminate the dimensional influence between indicators, data standardization
+				is required to solve the comparability between data indicators.
+		\end{enumerate}
+
+	\section{3. Program Modules}
+
+		\subsection{3.1 Theory}
+			The main element of k-means algorithm works by a two-step process called expectation-maximization.
+			The expectation step assigns each data point to its nearest centroid.
+			Then, the maximization step computes the mean of all the points for each cluster and sets the new centroid.
+			The main algorithm was described as below:
+
+			\begin{algorithm}
+				\caption{K-means algorithm}
+				\hspace*{0.02in}
+				\begin{algorithmic}[1]
+					\State Specify the number k of clusters to assign.
+					\State Randomly initialize k centroids.
+					\Repeat
+						\State \textbf{expectation: } Assign each point to its closest centroid.
+						\State \textbf{maximization: } Compute the new centroid(mean) of each cluster.
+					\Until The centroid positions do not change or iteration reach the max iteration times(30).
+				\end{algorithmic}
+			\end{algorithm}
 		
-		1).Consider we have a two-dimensional input space such that the input vector is $x = (x_1, x_2)^T$
-		Define the feature mapping $\phi(x) = (x_1^2, \sqrt{2}x_1x_2, x_2^2)^T$, What is the corresponding kernel function,
-		i.e. $K(x,z)$? Do not level $\phi(x)$ in your final answer.
+		\subsection{3.2 Code}
+			In the assignment, I follow the scikit-learn style to design my KMeans class which accepts one parameter name $n\_clusters$ with
+			default value as 2. The two main methods name $fit$ and $predict$, $fit$ accepts the samples and execute the k-means algorithm, 
+			$predict$ doesn't accept parameter and return the labels of each sample.
 
-		\solution:
-		
-		$K(x,z) = \phi(x)^T \cdot \phi(z) = (x_1^2, \sqrt{2}x_1x_2, x_2^2) \cdot (z_1^2, \sqrt{2}z_1z_2, z_2^2)^T = x_1^2z_1^2+ 2x_1x_2z_1z_2+x_2^2z_2^2$
+	\section{4. Result}
+		In Seeds Data Set, I set $n\_clusters=3$, and get a result as below:
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=0.6\textwidth]{1.png}
+				\caption{Seeds Data Set cluster}
+				\label{Fig.main5}
+			\end{figure}
 
+		In Iris Data Set, I set $n\_clusters=3$, and get a result as below:
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=0.6\textwidth]{2.png}
+				\caption{Iris Data Set cluster}
+				\label{Fig.main5}
+			\end{figure}
 
-		2).Suppose we want to compute the value of the kernel function$K(x,z)$ from the previous
-		question, on two vectors $x,z \in \mathbb{R}^2$.How many additions and multiplications are needed if you 
-		
-		(a) map the input vector to the feature space and the perform the dot product on the mapped features?
-
-		\solution:
-		
-		To compute this projection, we need 4 multiplications, there exists two point, so need 8 multiplications,
-		and then the dot product itself requires 3 multiplications and 2 additions.so we totally need
-		11 multiplications and 2 additions.
-
-		(b) compute through the kernel function you derived in question 1?
-
-		\solution:
-
-		$K(x,z) = x_1^2z_1^2+ 2x_1x_2z_1z_2+x_2^2z_2^2 = (x_1z_1 + x_2z_2)^2$ \\
-		From the above equation, we can easily find that we need 3 multiplications and 1 additions.
-
-		\item
-		Kernel functions, Consider the following kernel function: \\
-		$
-			K(x,x^{'})=
-				\begin{cases}
-				1 &\mbox{if $x=x^{'}$}\\\
-				0 &\mbox{otherwise}
-				\end{cases}
-		$
-
-		1).Prove this is a legal kernel. That is, describe an implicit mapping: $\Phi:X \rightarrow \mathbb{R}^m$ such that
-		$ K(x, x^{'}) = \Phi(x) * \Phi(x^{'})$. (You may assume the instance space $X$ is finite.)
-		
-		\solution:
-
-		We get get the kernel matrix 
-		$ K = 
-				\begin{pmatrix}
-					1 & 0 & \cdots & 0 \\
-					0 & 1 & \cdots & 0 \\
-					\vdots & \vdots & \ddots & \vdots \\
-					0 & 0 & \cdots & 1 
-				\end{pmatrix}
-		$, and $k$ is a is positive semidefinite matrix, so this is a legal kernel.
-		
-		2).In this kernel space, any labeling of points in $X$ will be linearly separable. Justify this claim.
-
-		\solution:
-
-		$K(x_i,x_j)=\Phi(x_i)^T \cdot \Phi(x_j) = \begin{cases}
-			1 &\mbox{if $x_i=x_j$}\\\
-			0 &\mbox{otherwise}
-			\end{cases}
-		$
-		Then $\Phi(x_i) = e_i$, $e_i$ is the column vertor which the $i$th element is 1 as $[0,0,0,...,1..., 0]^T$
-
-		So the decision boundary is $f(x) = W^T \Phi(x) = W^T e_i = W_i = y_i$, all data point will be  linearly separable.
-		
-		3).Since all labelings are linearly separable, this kernel seems perfect for learning any target
-		function. Why is this actually a bad idea?
-		
-		\solution:
-
-		Because $W$ will overfit the data.
-		
-	\end{enumerate}
+	\section{Limitations and Inprovements}
+		The KMeans algorithm is nondeterministic, meaning it could produce different results from two separate runs
+		even if the runs were based on the same input. Instead we can use $DBSCAN$ to get a stable result.
 
 \end{document}
